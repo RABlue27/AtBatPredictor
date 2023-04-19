@@ -8,7 +8,7 @@ import pandas as pd
 # Statcast data only goes back to 2015. Remove the advanced (launch_speed, launch_angle, spin_rate, etc if you want to train longer)
 # https://pypi.org/project/pybaseball/
 
-# cache.enable()
+cache.enable()
 
 sc = statcast(start_dt="2015-01-01", end_dt="2023-04-18")
 sc = sc.loc[:, ["pitch_type", "game_date", "batter", "pitcher", "events", "stand", "inning", "pitch_number", 
