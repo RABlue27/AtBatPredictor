@@ -20,20 +20,38 @@ def month_to_short(month):
     # Return the abbreviation
     return month_abr
 
+counter = 0
+schedule_cache = {}
+
 for i, row in data.iterrows():
+    counter += 1
+    print(f"Processing row {counter} of {len(data)}")
+    
     game_date = row["game_date"]
     home_team = row["home_team"]
+    
+    # Map team abbreviations to full names
     if home_team == "CWS":
         home_team = "CHW"
     if home_team == "AZ":
-        home_team == "ARI"
+        home_team = "ARI"
     if home_team == "WSH":
-        home_team == "WSN"
+        home_team = "WSN"
+        
     year = game_date.year
     month = month_to_short(calendar.month_name[game_date.month])
     day = game_date.day
-    d = schedule_and_record(year, home_team)
+    
+    # Check if we already have the schedule and record for this team and year
+    if (home_team, year) not in schedule_cache:
+        schedule_cache[(home_team, year)] = schedule_and_record(year, home_team)
+    
+    # Get the schedule and record for this team and year
+    d = schedule_cache[(home_team, year)]
+    
     dm = month + " " + str(day)
+    
+    # Filter the schedule and record for the specified date
     d = d.loc[d.Date.str.contains(dm), :]
     
     # Get the value of the "D/N" column from the first row of `d`
@@ -41,7 +59,5 @@ for i, row in data.iterrows():
     
     # Append the "D/N" value to a new column in the current row of `data`
     data.loc[i, "D/N"] = dn_value
-
-
 
 data.to_csv("updated_csv.csv", index=False)
