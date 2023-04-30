@@ -1,9 +1,31 @@
 import pandas as pd
 from pybaseball import schedule_and_record
+from pybaseball import statcast
+from pybaseball import cache 
 import calendar
 import datetime
 
-data = pd.read_csv("test_csv.csv")
+cache.enable()
+
+# Retrieve the statcast data
+sc2 = statcast(start_dt="2022-01-01", end_dt="2023-01-01")
+sc2 = sc2.loc[:, ["game_date", "batter", "pitcher", "events", "home_team", "babip_value", "iso_value", "woba_value"]]
+sc1 = statcast(start_dt="2010-01-01", end_dt="2016-01-01")
+sc1 = sc1.loc[:, ["game_date", "batter", "pitcher", "events", "home_team", "babip_value", "iso_value", "woba_value"]]
+sc = pd.concat([sc1, sc2])
+
+# Filter out null events
+sc = sc[sc["events"].notnull()]
+
+# Change MIA to FLA for years before 2012
+sc.loc[sc["game_date"].dt.year < 2012, "home_team"] = sc.loc[sc["game_date"].dt.year < 2012, "home_team"].apply(lambda x: "FLA" if x == "MIA" else x)
+
+
+sc.to_csv("veryShort.csv", index=False)
+
+# Read the CSV file into a DataFrame
+data = pd.read_csv("veryShort.csv")
+
 data['game_date'] = pd.to_datetime(data['game_date'])
 
 def month_to_short(month):
@@ -63,6 +85,5 @@ for i, row in data.iterrows():
     # Append the "D/N" value to a new column in the current row of `data`
     data.loc[i, "D/N"] = dn_value
 
-  
-
-data.to_csv("updated_csv.csv", index=False)
+# Write the updated DataFrame to the same CSV file
+data.to_csv("veryShort.csv", index=False)
