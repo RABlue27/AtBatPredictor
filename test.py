@@ -8,18 +8,18 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 
 # Parameters
-NUM_EPOCHS = 1500
+NUM_EPOCHS = 500
 BATCH_SIZE = 128
 VALIDATION_SPLIT = 0.2
-LEARNING_RATE = 0.01
-OPTIMIZER = Adam(learning_rate=LEARNING_RATE, clipvalue=1.0)
+LEARNING_RATE = 0.001
+OPTIMIZER = Adam(learning_rate=LEARNING_RATE)
 VERBOSE = 2
 
 # Load Data
 dataset = pd.read_csv('combined-stats.csv')
 dataset = dataset.dropna()
-X = dataset[['batter', 'pitcher', 'babip_value', 'iso_value', 'game_temp', 'game_wind', 'game_humidity']].values
-Y = dataset['woba_value'].values.reshape(-1, 1)
+X = dataset[['batter', 'pitcher', 'babip_value', 'woba_value', 'game_temp', 'game_wind', 'game_humidity']].values
+Y = dataset['iso_value'].values.reshape(-1, 1)
 
 # Split the data into training and testing sets
 X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=42)
@@ -37,7 +37,7 @@ model.add(Dense(128,  activation='sigmoid', kernel_initializer='glorot_uniform')
 model.add(Dense(128, activation='sigmoid', kernel_initializer='glorot_uniform'))
 model.add(Dense(64, activation='sigmoid', kernel_initializer='glorot_uniform'))
 model.add(Dense(32,  activation='sigmoid', kernel_initializer='glorot_uniform'))
-model.add(Dense(1, activation='linear', kernel_initializer='glorot_uniform'))
+model.add(Dense(1, activation='sigmoid', kernel_initializer='glorot_uniform'))
 
 
 model.compile(loss='mean_squared_error', optimizer=OPTIMIZER, metrics=['mse'])
@@ -48,7 +48,7 @@ model.fit(X_train, Y_train, epochs=NUM_EPOCHS, batch_size=BATCH_SIZE, validation
 
 
 
-model.save("short.h5")
+model.save("no_scaler_2.h5")
 
 # Evaluate the model on the testing set
 loss, mse = model.evaluate(X_test, Y_test, verbose=0)
