@@ -8,10 +8,10 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 
 # Parameters
-NUM_EPOCHS = 4000
+NUM_EPOCHS = 1500
 BATCH_SIZE = 128
 VALIDATION_SPLIT = 0.2
-LEARNING_RATE = 0.001
+LEARNING_RATE = 0.01
 OPTIMIZER = Adam(learning_rate=LEARNING_RATE, clipvalue=1.0)
 VERBOSE = 2
 
@@ -23,6 +23,7 @@ Y = dataset['woba_value'].values.reshape(-1, 1)
 
 # Split the data into training and testing sets
 X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=42)
+
 
 # Normalize inputs by scaling
 scaler = StandardScaler()
@@ -45,7 +46,9 @@ model.compile(loss='mean_squared_error', optimizer=OPTIMIZER, metrics=['mse'])
 
 model.fit(X_train, Y_train, epochs=NUM_EPOCHS, batch_size=BATCH_SIZE, validation_data=(X_test, Y_test), verbose=VERBOSE)
 
-model.save("4000.h5")
+
+
+model.save("short.h5")
 
 # Evaluate the model on the testing set
 loss, mse = model.evaluate(X_test, Y_test, verbose=0)
